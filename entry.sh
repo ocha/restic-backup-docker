@@ -5,7 +5,7 @@ echo "Starting container ..."
 RESTIC_CMD=restic
 
 if [ -n "${ROOT_CERT}" ]; then
-	RESTIC_CMD="${RESTIC_CMD} --cert ${ROOT_CERT}"
+	RESTIC_CMD="${RESTIC_CMD} --cacert ${ROOT_CERT}"
 fi
 
 if [ -n "${NFS_TARGET}" ]; then
