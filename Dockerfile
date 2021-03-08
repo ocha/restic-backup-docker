@@ -4,10 +4,9 @@ FROM alpine:latest as rclone
 ADD https://downloads.rclone.org/rclone-current-linux-amd64.zip /
 RUN unzip rclone-current-linux-amd64.zip && mv rclone-*-linux-amd64/rclone /bin/rclone && chmod +x /bin/rclone
 
-FROM restic/restic:0.9.6
+FROM restic/restic:0.11.0
 
-# install mailx
-RUN apk add --update --no-cache heirloom-mailx
+RUN apk add --update --no-cache heirloom-mailx fuse curl
 
 COPY --from=rclone /bin/rclone /bin/rclone
 
@@ -23,6 +22,29 @@ ENV BACKUP_CRON="0 */6 * * *"
 ENV RESTIC_FORGET_ARGS=""
 ENV RESTIC_JOB_ARGS=""
 ENV MAILX_ARGS=""
+ENV RESTIC_REPOSITORY=""
+ENV RESTIC_PASSWORD=""
+ENV OS_AUTH_URL=""
+ENV OS_PROJECT_ID=""
+ENV OS_PROJECT_NAME=""
+ENV OS_USER_DOMAIN_NAME="Default"
+ENV OS_PROJECT_DOMAIN_ID="default"
+ENV OS_USERNAME=""
+ENV OS_PASSWORD=""
+ENV OS_REGION_NAME=""
+ENV OS_INTERFACE=""
+ENV OS_IDENTITY_API_VERSION=3
+
+# openshift fix
+RUN mkdir /.cache && \
+    chgrp -R 0 /.cache && \
+    chmod -R g=u /.cache && \
+    chgrp -R 0 /mnt && \
+    chmod -R g=u /mnt && \
+    chgrp -R 0 /var/spool/cron/crontabs/root && \
+    chmod -R g=u /var/spool/cron/crontabs/root && \
+    chgrp -R 0 /var/log/cron.log && \
+    chmod -R g=u /var/log/cron.log
 
 # /data is the dir where you have to put the data to be backed up
 VOLUME /data
